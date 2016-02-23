@@ -42,7 +42,7 @@ exports.register = function(server, options, next) {
     cache: config.cache
   });
 
-  server.ext('onPreResponse', require('./lib/pre-response').bind(internal));
+  server.ext('onPreHandler', require('./lib/pre-handler').bind(internal));
 
   if (config.cacheEndpoint) {
     server.route(require('./lib/routes')(server, config));

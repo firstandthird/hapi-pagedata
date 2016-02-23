@@ -21,10 +21,19 @@ server.register({
     throw err;
   }
 
+  server.method('test', (cb) => {
+    setTimeout(() => {
+      cb(null, { pre: true });
+    }, 500);
+  });
+
   server.route({
     path: '/',
     method: 'GET',
     config: {
+      pre: [
+        { method: 'test()', assign: 'test' }
+      ],
       plugins: {
         'hapi-pagedata': {
           pages: ['test-1', 'test-2']
