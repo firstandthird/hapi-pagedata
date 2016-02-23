@@ -16,14 +16,14 @@ const defaults = {
 };
 
 exports.register = function(server, options, next) {
-  const config = hoek.applyToDefaults(defaults, options);
+  const config = hoek.applyToDefaults(defaults, options, true);
 
   const schema = Joi.object().keys({
-    host: Joi.string().uri(),
+    host: Joi.string().uri().required(),
     key: Joi.string(),
     globalSlugs: Joi.array().allow(null),
     env: Joi.string(),
-    cache: Joi.object(),
+    cache: Joi.object().allow(null),
     cacheEndpoint: Joi.string(),
     verbose: Joi.boolean()
   });
@@ -38,9 +38,11 @@ exports.register = function(server, options, next) {
     config
   };
 
-  server.method('pageData.get', require('./lib/method').bind(internal), {
-    cache: config.cache
-  });
+  const methodOptions = {};
+  if (config.cache) {
+    methodOptions.cache = config.cache;
+  }
+  server.method('pageData.get', require('./lib/method').bind(internal), methodOptions);
 
   server.ext('onPreHandler', require('./lib/pre-handler').bind(internal));
 
