@@ -46,6 +46,7 @@ exports.register = function(server, options, next) {
 
   config.cache.generateFunc = require('./lib/fetch').bind(internal);
   internal.cache = server.cache(config.cache);
+  server.expose('cache', internal.cache);
 
   server.method('pageData.get', require('./lib/method-get').bind(internal));
   server.method('pageData.set', require('./lib/method-set').bind(internal));
