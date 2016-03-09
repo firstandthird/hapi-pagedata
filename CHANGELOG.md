@@ -1,4 +1,13 @@
 
+0.0.4 / 2016-03-08
+==================
+
+  * update cache endpoint to use custom cache object
+  * custom cache object
+  * hook to set cache
+  * use pagedata-api lib
+  * check for errors
+
 0.0.3 / 2016-02-26
 ==================
 
