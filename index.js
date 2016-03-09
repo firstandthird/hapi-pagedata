@@ -1,15 +1,18 @@
 'use strict';
 const hoek = require('hoek');
 const Joi = require('joi');
+const PageData = require('pagedata-api');
 
 const defaults = {
   globalSlugs: null,
   env: 'dev',
   cacheEndpoint: '/pagedata',
   verbose: false,
+  hookEndpoint: false,
   cache: {
-    expiresIn: 1000 * 60 * 60 * 24, //1 day
-    staleIn: 1000 * 60 * 60, //1 hour
+    segment: 'pagedata',
+    expiresIn: 1000 * 60 * 60 * 24 * 7, //1 week
+    staleIn: 1000 * 60 * 60 * 23, //23 hours
     staleTimeout: 200,
     generateTimeout: 5000
   }
@@ -25,6 +28,7 @@ exports.register = function(server, options, next) {
     env: Joi.string(),
     cache: Joi.object().allow(null),
     cacheEndpoint: Joi.string(),
+    hookEndpoint: Joi.string().allow(false),
     verbose: Joi.boolean()
   });
 
@@ -33,22 +37,28 @@ exports.register = function(server, options, next) {
     return next(validation.error);
   }
 
+  const pageData = new PageData(config.host, config.env, config.key);
   const internal = {
+    pageData,
     server,
     config
   };
 
-  const methodOptions = {};
-  if (config.cache) {
-    methodOptions.cache = config.cache;
-  }
-  server.method('pageData.get', require('./lib/method').bind(internal), methodOptions);
+  config.cache.generateFunc = require('./lib/fetch').bind(internal);
+  internal.cache = server.cache(config.cache);
+
+  server.method('pageData.get', require('./lib/method-get').bind(internal));
+  server.method('pageData.set', require('./lib/method-set').bind(internal));
 
   server.ext('onPreHandler', require('./lib/pre-handler').bind(internal));
 
   if (config.cacheEndpoint) {
-    server.route(require('./lib/routes')(server, config));
+    server.route(require('./lib/routes-cache')(server, config));
   }
+  if (config.hookEndpoint) {
+    server.route(require('./lib/routes-hook')(server, config));
+  }
+
   next();
 };
 

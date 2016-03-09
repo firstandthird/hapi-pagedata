@@ -1,9 +1,10 @@
+/* eslint-disable no-console */
 const Hapi = require('hapi');
 const port = process.env.PORT || 8080;
 
 const server = new Hapi.Server({
   debug: {
-    log: ['pagedata', 'error']
+    log: ['pagedata', 'error', 'cache']
   }
 });
 server.connection({ port });
@@ -13,6 +14,8 @@ server.register({
   options: {
     host: process.env.PAGEDATA_HOST,
     key: process.env.PAGEDATA_KEY,
+    env: 'dev',
+    hookEndpoint: '/hook',
     globalSlugs: ['global'],
     verbose: true
   }
@@ -40,14 +43,16 @@ server.register({
         }
       }
     },
-    handler: function(request, reply) {
+    handler(request, reply) {
       reply(request.pre);
     }
   });
+
   server.start((serverErr) => {
     if (serverErr) {
       throw serverErr;
     }
+    //server.methods.pageData.set('test-1', { blah: true });
     console.log('Server started', server.info.uri);
   });
 });
