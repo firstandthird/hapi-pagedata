@@ -11,6 +11,7 @@ const defaults = {
   hookEndpoint: false,
   cache: {
     segment: 'pagedata',
+    enabled: true,
     expiresIn: 1000 * 60 * 60 * 24 * 7, //1 week
     staleIn: 1000 * 60 * 60 * 23, //23 hours
     staleTimeout: 200,
@@ -45,6 +46,12 @@ exports.register = function(server, options, next) {
   };
 
   config.cache.generateFunc = require('./lib/fetch').bind(internal);
+  if (!config.cache.enabled) {
+    delete config.cache.staleIn;
+    delete config.cache.staleTimeout;
+    config.cache.expiresIn = 1;
+  }
+  delete config.cache.enabled;
   internal.cache = server.cache(config.cache);
   server.expose('cache', internal.cache);
 
