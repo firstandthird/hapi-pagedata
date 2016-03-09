@@ -6,8 +6,8 @@ const PageData = require('pagedata-api');
 const defaults = {
   globalSlugs: null,
   env: 'dev',
-  cacheEndpoint: '/pagedata',
   verbose: false,
+  cacheEndpoint: false,
   hookEndpoint: false,
   cache: {
     segment: 'pagedata',
@@ -27,7 +27,7 @@ exports.register = function(server, options, next) {
     globalSlugs: Joi.array().allow(null),
     env: Joi.string(),
     cache: Joi.object().allow(null),
-    cacheEndpoint: Joi.string(),
+    cacheEndpoint: Joi.string().allow(false),
     hookEndpoint: Joi.string().allow(false),
     verbose: Joi.boolean()
   });
