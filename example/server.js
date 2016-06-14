@@ -14,7 +14,6 @@ server.register({
   options: {
     host: process.env.PAGEDATA_HOST,
     key: process.env.PAGEDATA_KEY,
-    env: 'dev',
     cacheEndpoint: '/cache',
     hookEndpoint: '/hook',
     globalSlugs: ['global'],
