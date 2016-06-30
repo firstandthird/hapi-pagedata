@@ -1,4 +1,11 @@
 
+0.3.0 / 2016-06-29
+==================
+
+  * check tag on hook
+  * fixed logged error object
+  * updated example to check for tag
+
 0.2.0 / 2016-06-22
 ==================
 
