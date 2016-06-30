@@ -4,7 +4,8 @@ const port = process.env.PORT || 8080;
 
 const server = new Hapi.Server({
   debug: {
-    log: ['pagedata', 'error', 'cache']
+    log: ['pagedata', 'error', 'cache'],
+    request: ['error']
   }
 });
 server.connection({ port });
@@ -16,8 +17,9 @@ server.register({
     key: process.env.PAGEDATA_KEY,
     cacheEndpoint: '/cache',
     hookEndpoint: '/hook',
-    globalSlugs: ['global'],
-    verbose: true
+    //globalSlugs: ['global'],
+    verbose: true,
+    tag: 'test'
   }
 }, (err) => {
   if (err) {
@@ -39,7 +41,7 @@ server.register({
       ],
       plugins: {
         'hapi-pagedata': {
-          pages: ['test-1', 'test-2']
+          pages: ['test', 'test-2']
         }
       }
     },
