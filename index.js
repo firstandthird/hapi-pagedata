@@ -5,6 +5,7 @@ const PageData = require('pagedata-api');
 
 const defaults = {
   globalSlugs: null,
+  site: null,
   tag: '',
   verbose: false,
   cacheEndpoint: false,
@@ -27,6 +28,7 @@ exports.register = function(server, options, next) {
     key: Joi.string(),
     globalSlugs: Joi.array().allow(null),
     tag: Joi.string().allow(''),
+    site: Joi.string().allow(null),
     cache: Joi.object().allow(null),
     cacheEndpoint: Joi.string().allow(false),
     hookEndpoint: Joi.string().allow(false),
@@ -54,6 +56,7 @@ exports.register = function(server, options, next) {
   delete config.cache.enabled;
   internal.cache = server.cache(config.cache);
   server.expose('cache', internal.cache);
+  server.expose('api', pageData);
 
   server.method('pageData.get', require('./lib/method-get').bind(internal));
   server.method('pageData.set', require('./lib/method-set').bind(internal));
