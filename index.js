@@ -12,7 +12,7 @@ const defaults = {
   hookEndpoint: false,
   cache: {
     segment: 'pagedata',
-    enabled: true,
+    enabled: (process.env.NODE_ENV === 'production'),
     expiresIn: 1000 * 60 * 60 * 24 * 7, //1 week
     staleIn: 1000 * 60 * 60 * 23, //23 hours
     staleTimeout: 200,
