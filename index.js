@@ -2,6 +2,7 @@
 const hoek = require('hoek');
 const Joi = require('joi');
 const PageData = require('pagedata-api');
+const pkg = require('./package.json');
 
 const defaults = {
   globalSlugs: null,
@@ -10,6 +11,7 @@ const defaults = {
   verbose: false,
   cacheEndpoint: false,
   hookEndpoint: false,
+  userAgent: '',
   cache: {
     segment: 'pagedata',
     enabled: (process.env.NODE_ENV === 'production'),
@@ -40,7 +42,11 @@ exports.register = function(server, options, next) {
     return next(validation.error);
   }
 
-  const pageData = new PageData(config.host, config.key);
+  if (!config.userAgent) {
+    config.userAgent = `hapi-pagedata/${pkg.version}`;
+  }
+
+  const pageData = new PageData(config.host, config.key, config.userAgent);
   const internal = {
     pageData,
     server,
@@ -75,5 +81,5 @@ exports.register = function(server, options, next) {
 
 exports.register.attributes = {
   once: true,
-  pkg: require('./package.json')
+  pkg
 };
