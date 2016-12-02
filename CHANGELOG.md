@@ -1,4 +1,11 @@
 
+0.7.0 / 2016-12-02
+==================
+
+  * be able to set userAgent
+  * added a ping/pong event to check if hook is set up
+  * updated pagedata-api
+
 0.6.0 / 2016-11-15
 ==================
 
