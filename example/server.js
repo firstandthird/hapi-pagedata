@@ -13,12 +13,13 @@ server.connection({ port });
 server.register({
   register: require('../'),
   options: {
-    host: process.env.PAGEDATA_HOST,
-    key: process.env.PAGEDATA_KEY,
+    host: `http://localhost:${port}`,
+    key: 'key',
     cacheEndpoint: '/cache',
     hookEndpoint: '/hook',
     //globalSlugs: ['global'],
     verbose: true,
+    site: 'site',
     tag: 'test'
   }
 }, (err) => {
@@ -30,6 +31,20 @@ server.register({
     setTimeout(() => {
       cb(null, { pre: true });
     }, 500);
+  });
+
+  //mock pagedata
+  server.route({
+    path: '/api/sites/{site}/pages/{page}',
+    method: 'GET',
+    handler(request, reply) {
+      reply({
+        content: {
+          site: request.params.site,
+          page: request.params.page
+        }
+      });
+    }
   });
 
   server.route({
