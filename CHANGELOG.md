@@ -1,4 +1,9 @@
 
+0.8.0 / 2016-12-02
+==================
+
+  * be able to pass in default site, update pre-handler to work with sites
+
 0.7.0 / 2016-12-02
 ==================
 
