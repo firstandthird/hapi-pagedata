@@ -230,10 +230,67 @@ lab.experiment('exposed server objects', () => {
     }, allDone);
   });
 });
+
+lab.experiment('exposed server objects', () => {
+  lab.beforeEach(done => {
+    server = new Hapi.Server({
+      debug: { log: ['error', 'info', 'hapi-pagedata'], request: ['error'] }
+    });
+    server.connection({ port: 8080 });
+    done();
+  });
+  lab.afterEach((done) => {
+    server.stop(done);
+  });
+  lab.test('set', allDone => {
+    async.auto({
+      register: (done) => {
+        server.register({
+          register: require('../'),
+          options: {
+            host: 'http://localhost:8080',
+            key: 'key',
+            cacheEndpoint: '/cache',
+            hookEndpoint: '/hook',
+            verbose: true,
+            site: 'site',
+            tag: 'test'
+          }
+        }, done);
+      },
+      route: ['register', (done, results) => {
+        server.method('test', (cb) => {
+          setTimeout(() => {
+            cb(null, { some: 'thing' });
+          }, 500);
+        });
+        server.route({
+          path: '/',
+          method: 'GET',
+          config: {
+            pre: [
+              { method: 'test()', assign: 'test' }
+            ],
+          },
+          handler(request, reply) {
+            expect(typeof request.pre.test).to.equal('object');
+            expect(request.pre.test.some).to.equal('thing');
+            reply(request.pre);
+          }
+        });
+        server.start(done);
+      }],
+      verify: ['route', (done, results) => {
+        server.inject({
+          url: '/',
+          method: 'GET',
+        }, () => {
+          done();
+        });
+      }]
+    }, allDone);
+  });
+});
 /*
-server.expose('cache', internal.cache);
-server.expose('api', pageData);
-
 server.ext('onPreHandler', require('./lib/pre-handler').bind(internal));
-
 */
