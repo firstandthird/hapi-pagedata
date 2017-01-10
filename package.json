@@ -19,9 +19,6 @@
     "db"
   ],
   "devDependencies": {
-    "eslint": "^3.9.1",
-    "eslint-config-firstandthird": "^3.0.2",
-    "eslint-plugin-import": "^2.1.0",
     "hapi": "^13.0.0",
     "lab": "^11.2.1",
     "code": "^4.0.0",
