@@ -9,7 +9,7 @@
     "url": "https://github.com/firstandthird/hapi-pagedata.git"
   },
   "scripts": {
-    "test" : "lab test",
+    "test": "lab test",
     "lint": "eslint ."
   },
   "keywords": [
@@ -19,9 +19,12 @@
     "db"
   ],
   "devDependencies": {
+    "code": "^4.0.0",
+    "eslint": "^3.9.1",
+    "eslint-config-firstandthird": "^3.2.0",
+    "eslint-plugin-import": "^2.1.0",
     "hapi": "^13.0.0",
     "lab": "^11.2.1",
-    "code": "^4.0.0",
     "mocha": "^3.2.0"
   },
   "dependencies": {
