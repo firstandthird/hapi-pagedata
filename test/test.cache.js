@@ -125,6 +125,8 @@ lab.experiment('cache', () => {
             const stats = server.plugins['hapi-pagedata'].cache.stats;
             expect(stats.sets).to.equal(1);
             expect(stats.errors).to.equal(0);
+            const cache = server.plugins['hapi-pagedata'].cache;
+            expect(cache._cache.connection.byteSize).to.not.equal(0);
             done();
           });
         });
