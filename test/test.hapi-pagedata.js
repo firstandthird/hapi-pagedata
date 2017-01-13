@@ -291,6 +291,3 @@ lab.experiment('exposed server objects', () => {
     }, allDone);
   });
 });
-/*
-server.ext('onPreHandler', require('./lib/pre-handler').bind(internal));
-*/
