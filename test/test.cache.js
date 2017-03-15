@@ -134,6 +134,47 @@ lab.experiment('cache', () => {
     }, allDone);
   });
 
+  lab.test('call method if set', allDone => {
+    async.auto({
+      register: (done) => {
+        server.register({
+          register: require('../'),
+          options: {
+            host: 'http://localhost:8080',
+            key: 'key',
+            cacheEndpoint: '/cache',
+            hookEndpoint: '/hook',
+            hookSuccessMethod: 'hookSuccess',
+            verbose: true,
+            site: 'site',
+            tag: 'test'
+          }
+        }, done);
+      },
+      verify: ['register', (done, results) => {
+        server.method('hookSuccess', (id, tags) => {
+          expect(id).to.equal('site1');
+          expect(tags.length).to.equal(1);
+          expect(tags[0]).to.equal('test');
+          done();
+        });
+        server.start(() => {
+          server.inject({
+            method: 'POST',
+            url: '/hook',
+            payload: {
+              tags: ['test'],
+              slug: 'site1',
+              content: 'not really'
+            }
+          }, (res) => {
+            expect(res.result).to.equal('ok');
+          });
+        });
+      }]
+    }, allDone);
+  });
+
   lab.test('reports cache stats', allDone => {
     async.auto({
       register: (done) => {

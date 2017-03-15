@@ -34,6 +34,7 @@ exports.register = function(server, options, next) {
     cache: Joi.object().allow(null),
     cacheEndpoint: Joi.string().allow(false),
     hookEndpoint: Joi.string().allow(false),
+    hookSuccessMethod: Joi.string().allow(null),
     userAgent: Joi.string().allow(''),
     verbose: Joi.boolean()
   });
