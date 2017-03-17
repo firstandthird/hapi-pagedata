@@ -5,8 +5,6 @@ const PageData = require('pagedata-api');
 const pkg = require('./package.json');
 
 const defaults = {
-  globalSlugs: null,
-  site: null,
   tag: '',
   verbose: false,
   cacheEndpoint: false,
@@ -28,9 +26,7 @@ exports.register = function(server, options, next) {
   const schema = Joi.object().keys({
     host: Joi.string().uri().required(),
     key: Joi.string(),
-    globalSlugs: Joi.array().allow(null),
     tag: Joi.string().allow(''),
-    site: Joi.string().allow(null),
     cache: Joi.object().allow(null),
     cacheEndpoint: Joi.string().allow(false),
     hookEndpoint: Joi.string().allow(false),
@@ -48,9 +44,9 @@ exports.register = function(server, options, next) {
     config.userAgent = `hapi-pagedata/${pkg.version}`;
   }
 
-  const pageData = new PageData(config.host, config.key, config.userAgent);
+  const api = new PageData(config.host, config.key, config.userAgent);
   const internal = {
-    pageData,
+    api,
     server,
     config
   };
@@ -64,18 +60,15 @@ exports.register = function(server, options, next) {
   delete config.cache.enabled;
   internal.cache = server.cache(config.cache);
   server.expose('cache', internal.cache);
-  server.expose('api', pageData);
+  server.expose('api', api);
 
   server.method('pageData.get', require('./lib/method-get').bind(internal));
-  server.method('pageData.set', require('./lib/method-set').bind(internal));
-
-  server.ext('onPreHandler', require('./lib/pre-handler').bind(internal));
 
   if (config.cacheEndpoint) {
-    server.route(require('./lib/routes-cache')(server, config));
+    server.route(require('./lib/routes-cache')(server, config, internal.cache));
   }
   if (config.hookEndpoint) {
-    server.route(require('./lib/routes-hook')(server, config));
+    server.route(require('./lib/routes-hook')(server, config, internal.cache));
   }
 
   next();

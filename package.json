@@ -10,7 +10,8 @@
   },
   "scripts": {
     "test": "lab test",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "example": "node example/server.js"
   },
   "keywords": [
     "hapi",

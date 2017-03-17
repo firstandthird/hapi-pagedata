@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+'use strict';
 const Hapi = require('hapi');
 const port = process.env.PORT || 8080;
 
@@ -13,34 +14,28 @@ server.connection({ port });
 server.register({
   register: require('../'),
   options: {
-    host: `http://localhost:${port}`,
-    key: 'key',
+    host: process.env.PAGEDATA_HOST || `http://localhost:${port}`,
+    key: process.env.PAGEDDATA_KEY || 'key',
+    cache: {
+      enabled: true
+    },
     cacheEndpoint: '/cache',
     hookEndpoint: '/hook',
-    //globalSlugs: ['global'],
     verbose: true,
-    site: 'site',
-    tag: 'test'
+    tag: 'prod'
   }
 }, (err) => {
   if (err) {
     throw err;
   }
 
-  server.method('test', (cb) => {
-    setTimeout(() => {
-      cb(null, { pre: true });
-    }, 500);
-  });
-
   //mock pagedata
   server.route({
-    path: '/api/sites/{site}/pages/{page}',
+    path: '/api/pages/{page}',
     method: 'GET',
     handler(request, reply) {
       reply({
         content: {
-          site: request.params.site,
           page: request.params.page
         }
       });
@@ -48,20 +43,39 @@ server.register({
   });
 
   server.route({
-    path: '/',
+    path: '/pages/{slug}',
     method: 'GET',
     config: {
       pre: [
-        { method: 'test()', assign: 'test' }
-      ],
-      plugins: {
-        'hapi-pagedata': {
-          pages: ['test', 'test-2']
-        }
-      }
+        { method: 'pageData.get(params.slug)', assign: 'data' }
+      ]
     },
     handler(request, reply) {
       reply(request.pre);
+    }
+  });
+
+  server.route({
+    path: '/sites',
+    method: 'GET',
+    handler(request, reply) {
+      request.server.plugins['hapi-pagedata'].api.getSites(reply);
+    }
+  });
+
+  server.route({
+    path: '/sites/{site}',
+    method: 'GET',
+    handler(request, reply) {
+      request.server.plugins['hapi-pagedata'].api.getPages(request.params.site, request.query.collection, reply);
+    }
+  });
+
+  server.route({
+    path: '/sites/{site}/collections',
+    method: 'GET',
+    handler(request, reply) {
+      request.server.plugins['hapi-pagedata'].api.getCollectionsBySiteSlug(request.params.site, reply);
     }
   });
 
