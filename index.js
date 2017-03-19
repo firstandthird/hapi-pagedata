@@ -51,18 +51,21 @@ exports.register = function(server, options, next) {
     config
   };
 
-  config.cache.generateFunc = require('./lib/fetch').bind(internal);
-  if (!config.cache.enabled) {
-    delete config.cache.staleIn;
-    delete config.cache.staleTimeout;
-    config.cache.expiresIn = 1;
-  }
-  delete config.cache.enabled;
-  internal.cache = server.cache(config.cache);
-  server.expose('cache', internal.cache);
   server.expose('api', api);
 
-  server.method('pageData.get', require('./lib/method-get').bind(internal));
+  const methodOptions = {};
+  if (config.cache.enabled) {
+    delete config.cache.enabled;
+    methodOptions.cache = config.cache;
+    methodOptions.generateKey = function(slug, tag) {
+      if (!tag) {
+        return slug;
+      }
+      return `${slug}_${tag}`;
+    };
+  }
+  server.method('pagedata.getPage', require('./lib/method-get').bind(internal), methodOptions);
+  server.method('pagedata.getPageContent', require('./lib/method-getcontent').bind(internal));
 
   if (config.cacheEndpoint) {
     server.route(require('./lib/routes-cache')(server, config, internal.cache));

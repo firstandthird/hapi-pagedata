@@ -47,7 +47,7 @@ server.register({
     method: 'GET',
     config: {
       pre: [
-        { method: 'pageData.get(params.slug)', assign: 'data' }
+        { method: 'pagedata.getPage(params.slug)', assign: 'data' }
       ]
     },
     handler(request, reply) {
@@ -55,6 +55,18 @@ server.register({
     }
   });
 
+  server.route({
+    path: '/pages/{slug}/content',
+    method: 'GET',
+    config: {
+      pre: [
+        { method: 'pagedata.getPageContent(params.slug)', assign: 'data' }
+      ]
+    },
+    handler(request, reply) {
+      reply(request.pre);
+    }
+  });
   server.route({
     path: '/sites',
     method: 'GET',

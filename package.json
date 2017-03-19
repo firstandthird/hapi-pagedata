@@ -29,9 +29,9 @@
     "mocha": "^3.2.0"
   },
   "dependencies": {
-    "async": "^1.5.2",
+    "async": "2.1.5",
     "hoek": "^3.0.4",
     "joi": "^8.0.2",
-    "pagedata-api": "0.5.0"
+    "pagedata-api": "0.6.0"
   }
 }
