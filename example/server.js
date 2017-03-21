@@ -16,9 +16,7 @@ server.register({
   options: {
     host: process.env.PAGEDATA_HOST || `http://localhost:${port}`,
     key: process.env.PAGEDDATA_KEY || 'key',
-    cache: {
-      enabled: true
-    },
+    enableCache: process.env.PAGEDATA_CACHE || true,
     cacheEndpoint: '/cache',
     hookEndpoint: '/hook',
     verbose: true,
@@ -67,6 +65,20 @@ server.register({
       reply(request.pre);
     }
   });
+
+  server.route({
+    path: '/pages',
+    method: 'GET',
+    config: {
+      pre: [
+        { method: 'pagedata.getPages(query.siteSlug, query.collectionId)', assign: 'data' }
+      ]
+    },
+    handler(request, reply) {
+      reply(request.pre);
+    }
+  });
+
   server.route({
     path: '/sites',
     method: 'GET',

@@ -10,9 +10,8 @@ const defaults = {
   cacheEndpoint: false,
   hookEndpoint: false,
   userAgent: '',
+  enableCache: (process.env.NODE_ENV === 'production'),
   cache: {
-    segment: 'pagedata',
-    enabled: (process.env.NODE_ENV === 'production'),
     expiresIn: 1000 * 60 * 60 * 24 * 7, //1 week
     staleIn: 1000 * 60 * 60 * 23, //23 hours
     staleTimeout: 200,
@@ -27,6 +26,7 @@ exports.register = function(server, options, next) {
     host: Joi.string().uri().required(),
     key: Joi.string(),
     tag: Joi.string().allow(''),
+    enableCache: Joi.boolean(),
     cache: Joi.object().allow(null),
     cacheEndpoint: Joi.string().allow(false),
     hookEndpoint: Joi.string().allow(false),
@@ -53,18 +53,19 @@ exports.register = function(server, options, next) {
 
   server.expose('api', api);
 
-  const methodOptions = {};
-  if (config.cache.enabled) {
-    delete config.cache.enabled;
-    methodOptions.cache = config.cache;
-    methodOptions.generateKey = function(slug, tag) {
-      if (!tag) {
-        return slug;
-      }
+  server.method('pagedata.getPage', require('./lib/method-get').bind(internal), {
+    cache: config.enableCache ? Object.assign({}, config.cache) : undefined,
+    generateKey(slug, tag) {
       return `${slug}_${tag}`;
-    };
-  }
-  server.method('pagedata.getPage', require('./lib/method-get').bind(internal), methodOptions);
+    }
+  });
+
+  server.method('pagedata.getPages', require('./lib/method-pages').bind(internal), {
+    cache: config.enableCache ? Object.assign({}, config.cache) : undefined,
+    generateKey(siteSlug, collectionId) {
+      return `${siteSlug}_${collectionId}`;
+    }
+  });
   server.method('pagedata.getPageContent', require('./lib/method-getcontent').bind(internal));
 
   if (config.cacheEndpoint) {
