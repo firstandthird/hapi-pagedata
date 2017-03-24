@@ -56,6 +56,9 @@ exports.register = function(server, options, next) {
   server.method('pagedata.getPage', require('./lib/method-get').bind(internal), {
     cache: config.enableCache ? Object.assign({}, config.cache) : undefined,
     generateKey(slug, tag) {
+      if (!tag) {
+        return slug;
+      }
       return `${slug}_${tag}`;
     }
   });
@@ -63,6 +66,9 @@ exports.register = function(server, options, next) {
   server.method('pagedata.getPages', require('./lib/method-pages').bind(internal), {
     cache: config.enableCache ? Object.assign({}, config.cache) : undefined,
     generateKey(siteSlug, collectionId) {
+      if (!collectionId) {
+        return siteSlug;
+      }
       return `${siteSlug}_${collectionId}`;
     }
   });
