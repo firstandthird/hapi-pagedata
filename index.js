@@ -6,7 +6,7 @@ const pkg = require('./package.json');
 
 const defaults = {
   tag: '',
-  verbose: false,
+  verbose: true,
   cacheEndpoint: false,
   hookEndpoint: false,
   userAgent: '',
