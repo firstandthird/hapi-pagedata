@@ -71,7 +71,7 @@ server.register({
     method: 'GET',
     config: {
       pre: [
-        { method: 'pagedata.getPages(query.siteSlug, query.collectionId)', assign: 'data' }
+        { method: 'pagedata.getPages()', assign: 'data' }
       ]
     },
     handler(request, reply) {
@@ -91,7 +91,13 @@ server.register({
     path: '/sites/{site}',
     method: 'GET',
     handler(request, reply) {
-      request.server.plugins['hapi-pagedata'].api.getPages(request.params.site, request.query.collection, reply);
+      const query = {
+        siteSlug: request.params.site
+      };
+      if (request.query.collection) {
+        query.collection = request.query.collection;
+      }
+      request.server.plugins['hapi-pagedata'].api.getPages(query, reply);
     }
   });
 
@@ -99,7 +105,7 @@ server.register({
     path: '/sites/{site}/collections',
     method: 'GET',
     handler(request, reply) {
-      request.server.plugins['hapi-pagedata'].api.getCollectionsBySiteSlug(request.params.site, reply);
+      request.server.plugins['hapi-pagedata'].api.getCollections({ siteSlug: request.params.site }, reply);
     }
   });
 

@@ -68,11 +68,8 @@ exports.register = function(server, options, next) {
 
   server.method('pagedata.getPages', require('./lib/method-pages').bind(internal), {
     cache: config.enableCache ? Object.assign({}, config.cache) : undefined,
-    generateKey(siteSlug, collectionId) {
-      if (!collectionId) {
-        return siteSlug;
-      }
-      return `${siteSlug}_${collectionId}`;
+    generateKey(query) {
+      return query ? JSON.stringify(query) : '_all';
     }
   });
   server.method('pagedata.getPageContent', require('./lib/method-getcontent').bind(internal));
