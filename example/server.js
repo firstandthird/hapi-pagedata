@@ -17,10 +17,12 @@ server.register({
     host: process.env.PAGEDATA_HOST || `http://localhost:${port}`,
     key: process.env.PAGEDDATA_KEY || 'key',
     enableCache: process.env.PAGEDATA_CACHE || true,
+    //enablePagesCache: true,
+    //cachePagesWithContent: true,
     cacheEndpoint: '/cache',
     hookEndpoint: '/hook',
     verbose: true,
-    tag: 'prod'
+    //tag: 'prod'
   }
 }, (err) => {
   if (err) {
@@ -71,7 +73,7 @@ server.register({
     method: 'GET',
     config: {
       pre: [
-        { method: 'pagedata.getPages()', assign: 'data' }
+        { method: 'pagedata.getPages(query)', assign: 'data' }
       ]
     },
     handler(request, reply) {
