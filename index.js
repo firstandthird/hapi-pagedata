@@ -11,8 +11,8 @@ const defaults = {
   hookEndpoint: false,
   userAgent: '',
   enableCache: (process.env.NODE_ENV === 'production'),
-  enablePagesCache: false,
-  cachePagesWithContent: false,
+  enableCollectionCache: false,
+  cacheCollectionWithContent: false,
   cache: {
     expiresIn: 1000 * 60 * 60 * 24 * 7, //1 week
     staleIn: 1000 * 60 * 60 * 23, //23 hours
@@ -29,8 +29,8 @@ exports.register = function(server, options, next) {
     key: Joi.string(),
     tag: Joi.string().allow(''),
     enableCache: Joi.boolean(),
-    enablePagesCache: Joi.boolean(),
-    cachePagesWithContent: Joi.boolean(),
+    enableCollectionCache: Joi.boolean(),
+    cacheCollectionWithContent: Joi.boolean(),
     cache: Joi.object().allow(null),
     cacheEndpoint: Joi.string().allow(false),
     hookEndpoint: Joi.string().allow(false),
@@ -71,7 +71,7 @@ exports.register = function(server, options, next) {
   });
 
   server.method('pagedata.getPages', require('./lib/method-pages').bind(internal), {
-    cache: config.enablePagesCache ? Object.assign({}, config.cache) : undefined,
+    cache: config.enableCollectionCache ? Object.assign({}, config.cache) : undefined,
     generateKey(query) {
       return query ? JSON.stringify(query) : '_all';
     }
