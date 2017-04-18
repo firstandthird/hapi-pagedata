@@ -22,7 +22,7 @@ server.register({
     cacheEndpoint: '/cache',
     hookEndpoint: '/hook',
     verbose: true,
-    //tag: 'prod'
+    tag: process.env.PAGEDATA_TAG
   }
 }, (err) => {
   if (err) {
