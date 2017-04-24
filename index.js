@@ -73,6 +73,9 @@ exports.register = function(server, options, next) {
   server.method('pagedata.getPages', require('./lib/method-pages').bind(internal), {
     cache: config.enableCollectionCache ? Object.assign({}, config.cache) : undefined,
     generateKey(query) {
+      if (!query.tag && config.tag) {
+        query.tag = config.tag;
+      }
       return query ? JSON.stringify(query) : '_all';
     }
   });
