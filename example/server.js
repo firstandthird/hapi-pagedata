@@ -15,14 +15,14 @@ server.register({
   register: require('../'),
   options: {
     host: process.env.PAGEDATA_HOST || `http://localhost:${port}`,
-    key: process.env.PAGEDDATA_KEY || 'key',
-    enableCache: process.env.PAGEDATA_CACHE || true,
-    enableCollectionCache: true,
-    cacheCollectionWithContent: true,
+    key: process.env.PAGEDATA_KEY || 'key',
+    status: 'draft',
+    enablePageCache: process.env.PAGEDATA_CACHE || false,
+    enableProjectPagesCache: process.env.PAGEDATA_CACHE || false,
+    enableParentPagesCache: process.env.PAGEDATA_CACHE || false,
     cacheEndpoint: '/cache',
     hookEndpoint: '/hook',
-    verbose: true,
-    tag: process.env.PAGEDATA_TAG || ''
+    verbose: true
   }
 }, (err) => {
   if (err) {
@@ -69,11 +69,11 @@ server.register({
   });
 
   server.route({
-    path: '/pages',
+    path: '/pages/{slug}/children',
     method: 'GET',
     config: {
       pre: [
-        { method: 'pagedata.getPages(query)', assign: 'data' }
+        { method: 'pagedata.getParentPages(params.slug)', assign: 'data' }
       ]
     },
     handler(request, reply) {
@@ -82,32 +82,31 @@ server.register({
   });
 
   server.route({
-    path: '/sites',
+    path: '/projects',
     method: 'GET',
     handler(request, reply) {
-      request.server.plugins['hapi-pagedata'].api.getSites(reply);
+      request.server.plugins['hapi-pagedata'].api.getProjects(reply);
     }
   });
 
   server.route({
-    path: '/sites/{site}',
+    path: '/projects/{project}',
     method: 'GET',
+    config: {
+      pre: [
+        { method: 'pagedata.getProjectPages(params.project)', assign: 'data' }
+      ]
+    },
     handler(request, reply) {
-      const query = {
-        siteSlug: request.params.site
-      };
-      if (request.query.collection) {
-        query.collection = request.query.collection;
-      }
-      request.server.plugins['hapi-pagedata'].api.getPages(query, reply);
+      reply(request.pre);
     }
   });
 
   server.route({
-    path: '/sites/{site}/collections',
+    path: '/projects/{project}/collections',
     method: 'GET',
     handler(request, reply) {
-      request.server.plugins['hapi-pagedata'].api.getCollections({ siteSlug: request.params.site }, reply);
+      request.server.plugins['hapi-pagedata'].api.getCollections({ projectSlug: request.params.project }, reply);
     }
   });
 
