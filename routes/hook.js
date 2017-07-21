@@ -16,9 +16,9 @@ module.exports = function(server, api, config) {
         return reply('pong');
       }
 
-      if ((config.tag && !payload.tags) || (config.tag && payload.tags.indexOf(config.tag) === -1)) {
+      if (config.status === 'published' && payload.status !== 'published') {
         //tags don't match
-        server.log(['pagedata', 'pagedata-hook', 'info'], { message: 'cache hook skipped', slug: payload.slug, serverTag: config.tag, pageTags: payload.tags });
+        server.log(['pagedata', 'pagedata-hook', 'info'], { message: 'cache hook skipped', slug: payload.slug, configStatus: config.status, pageStatus: payload.status });
         return reply('skipped');
       }
 
@@ -63,7 +63,7 @@ module.exports = function(server, api, config) {
             if (!method) {
               server.log(['pagedata', 'pagedata-hook', 'error'], `${config.hookSuccessMethod} doesn't exist`);
             } else {
-              method(payload.slug, payload.tags);
+              method(payload.slug, payload.status);
             }
           }
           done();
