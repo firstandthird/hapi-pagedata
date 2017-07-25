@@ -11,11 +11,17 @@ module.exports = function(server, api, config) {
       status: config.status
     };
     api.getPages(query, (err, pages) => {
+      if (err) {
+        if (config.verbose) {
+          server.log(['pagedata', 'getParentPages', 'error', parentPageSlug], err);
+        }
+        return done(err);
+      }
       if (config.verbose) {
         const end = new Date().getTime();
         server.log(['pagedata', 'fetch'], { parentPageSlug, status: config.status, responseTime: end - start });
       }
-      done(err, pages);
+      done(null, pages);
     });
   }, {
     cache
