@@ -3,7 +3,7 @@
   "description": "Hapi plugin to fetch data from the pagedata service",
   "homepage": "https://github.com/firstandthird/hapi-pagedata",
   "author": "First+Third",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "repository": {
     "type": "git",
     "url": "https://github.com/firstandthird/hapi-pagedata.git"
