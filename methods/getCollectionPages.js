@@ -4,7 +4,7 @@ module.exports = function(server, api, config) {
     cache = Object.assign({}, config.cache);
   }
 
-  server.method('pagedata.getParentPages', (parentPageSlug, done) => {
+  server.method('pagedata.getCollectionPages', (parentPageSlug, done) => {
     const start = new Date().getTime();
     const query = {
       parentPageSlug,
@@ -13,7 +13,7 @@ module.exports = function(server, api, config) {
     api.getPages(query, (err, pages) => {
       if (err) {
         if (config.verbose) {
-          server.log(['pagedata', 'getParentPages', 'error', parentPageSlug], err);
+          server.log(['pagedata', 'getCollectionPages', 'error', parentPageSlug], err);
         }
         return done(err);
       }

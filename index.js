@@ -57,7 +57,7 @@ exports.register = function(server, options, next) {
   require('./methods/getPage')(server, api, config);
   require('./methods/getPageContent')(server, api, config);
   require('./methods/getProjectPages')(server, api, config);
-  require('./methods/getParentPages')(server, api, config);
+  require('./methods/getCollectionPages')(server, api, config);
   require('./routes/hook')(server, api, config);
 
   next();
