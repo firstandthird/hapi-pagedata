@@ -73,7 +73,7 @@ server.register({
     method: 'GET',
     config: {
       pre: [
-        { method: 'pagedata.getParentPages(params.slug)', assign: 'data' }
+        { method: 'pagedata.getCollectionPages(params.slug)', assign: 'data' }
       ]
     },
     handler(request, reply) {

@@ -49,13 +49,13 @@ module.exports = function(server, api, config) {
           if (!config.enableParentPagesCache || !get.parentPage) {
             return done();
           }
-          server.methods.pagedata.getParentPages.cache.drop(get.parentPage.slug, done);
+          server.methods.pagedata.getCollectionPages.cache.drop(get.parentPage.slug, done);
         },
         parentPages(dropParentPages, get, done) {
           if (!config.enableParentPagesCache || !get.parentPage) {
             return done();
           }
-          server.methods.pagedata.getParentPages(get.parentPage.slug, done);
+          server.methods.pagedata.getCollectionPages(get.parentPage.slug, done);
         },
         hook(get, done) {
           if (config.hookSuccessMethod) {
