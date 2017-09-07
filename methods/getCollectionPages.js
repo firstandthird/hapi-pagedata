@@ -4,6 +4,10 @@ module.exports = function(server, api, config) {
   const cache = config.collectionPagesCache ? Object.assign({}, config.collectionPagesCache) : undefined;
 
   server.method('pagedata.getCollectionPages', (parentPageSlug, query, done) => {
+    if (typeof query === 'function') {
+      done = query;
+      query = {};
+    }
     const start = new Date().getTime();
     query.parentPageSlug = parentPageSlug;
     if (!query.status) {

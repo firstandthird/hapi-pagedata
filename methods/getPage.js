@@ -3,6 +3,10 @@ const generateKey = require('../lib/generateKey.js');
 module.exports = function(server, api, config) {
   const cache = config.pageCache ? Object.assign({}, config.pageCache) : undefined;
   server.method('pagedata.getPage', (slug, query, done) => {
+    if (typeof query === 'function') {
+      done = query;
+      query = {};
+    }
     const start = new Date().getTime();
     // let caller override status or just set to default config:
     if (!query.status) {

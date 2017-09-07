@@ -6,7 +6,6 @@ const pkg = require('./package.json');
 
 const defaults = {
   verbose: true,
-  cacheEndpoint: false,
   userAgent: '',
   status: 'published',
   pageCache: false,

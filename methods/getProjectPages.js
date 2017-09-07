@@ -4,6 +4,10 @@ module.exports = function(server, api, config) {
   const cache = config.projectPagesCache ? Object.assign({}, config.projectPagesCache) : undefined;
 
   server.method('pagedata.getProjectPages', (projectSlug, query, done) => {
+    if (typeof query === 'function') {
+      done = query;
+      query = {};
+    }
     const start = new Date().getTime();
     query.projectSlug = projectSlug;
     if (!query.status) {
