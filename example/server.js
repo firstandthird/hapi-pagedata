@@ -17,11 +17,9 @@ server.register({
     host: process.env.PAGEDATA_HOST || `http://localhost:${port}`,
     key: process.env.PAGEDATA_KEY || 'key',
     status: 'draft',
-    enablePageCache: process.env.PAGEDATA_CACHE || false,
-    enableProjectPagesCache: process.env.PAGEDATA_CACHE || false,
-    enableParentPagesCache: process.env.PAGEDATA_CACHE || false,
-    cacheEndpoint: '/cache',
-    hookEndpoint: '/hook',
+    pageCache: process.env.PAGEDATA_CACHE || false,
+    projectPagesCache: process.env.PAGEDATA_CACHE || false,
+    parentPagesCache: process.env.PAGEDATA_CACHE || false,
     verbose: true
   }
 }, (err) => {
@@ -47,20 +45,7 @@ server.register({
     method: 'GET',
     config: {
       pre: [
-        { method: 'pagedata.getPage(params.slug)', assign: 'data' }
-      ]
-    },
-    handler(request, reply) {
-      reply(request.pre);
-    }
-  });
-
-  server.route({
-    path: '/pages/{slug}/content',
-    method: 'GET',
-    config: {
-      pre: [
-        { method: 'pagedata.getPageContent(params.slug)', assign: 'data' }
+        { method: 'pagedata.getPage(params.slug, { populate: "createdBy" })', assign: 'data' }
       ]
     },
     handler(request, reply) {
@@ -73,7 +58,7 @@ server.register({
     method: 'GET',
     config: {
       pre: [
-        { method: 'pagedata.getParentPages(params.slug)', assign: 'data' }
+        { method: 'pagedata.getCollectionPages(params.slug, { populate: "content" })', assign: 'data' }
       ]
     },
     handler(request, reply) {
@@ -94,7 +79,7 @@ server.register({
     method: 'GET',
     config: {
       pre: [
-        { method: 'pagedata.getProjectPages(params.project)', assign: 'data' }
+        { method: 'pagedata.getProjectPages(params.project, { status: "published" })', assign: 'data' }
       ]
     },
     handler(request, reply) {
@@ -106,7 +91,7 @@ server.register({
     path: '/projects/{project}/collections',
     method: 'GET',
     handler(request, reply) {
-      request.server.plugins['hapi-pagedata'].api.getCollections({ projectSlug: request.params.project }, reply);
+      request.server.plugins['hapi-pagedata'].api.getCollectionPages(request.params.project, { limit: 10 }, reply);
     }
   });
 
@@ -118,4 +103,3 @@ server.register({
     console.log('Server started', server.info.uri);
   });
 });
-

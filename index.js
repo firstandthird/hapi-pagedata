@@ -7,13 +7,13 @@ const pkg = require('./package.json');
 const defaults = {
   verbose: true,
   cacheEndpoint: false,
-  hookEndpoint: false,
   userAgent: '',
   status: 'published',
   pageCache: false,
   projectPagesCache: false,
   collectionPagesCache: false,
-  // example settings for caches: {
+  // example options for pageCache/projectPagesCache/collectionPagesCache:
+  // {
   //   expiresIn: 1000 * 60 * 60 * 24 * 7, //1 week
   //   staleIn: 1000 * 60 * 60 * 23, //23 hours
   //   staleTimeout: 200,
@@ -32,8 +32,6 @@ exports.register = function(server, options, next) {
     projectPagesCache: Joi.object().allow(false),
     collectionPagesCache: Joi.object().allow(false),
     cacheEndpoint: Joi.string().allow(false),
-    hookEndpoint: Joi.string().allow(false),
-    hookSuccessMethod: Joi.string().allow(null),
     userAgent: Joi.string().allow(''),
     verbose: Joi.boolean()
   });
