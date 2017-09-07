@@ -141,6 +141,7 @@ lab.test('getCollectionPages', allDone => {
 });
 
 lab.test('getPage --cache', allDone => {
+  let status = 'hungry';
   async.autoInject({
     register(done) {
       mockServer.route({
@@ -148,7 +149,7 @@ lab.test('getPage --cache', allDone => {
         path: '/api/pages/my-page',
         handler(request, reply) {
           expect(request.query.status).to.equal('published');
-          return reply(null, { slug: 'my-page', content: { status: 'hungry' } });
+          return reply(null, { slug: 'my-page', content: { status } });
         }
       });
       server.register({
@@ -174,11 +175,12 @@ lab.test('getPage --cache', allDone => {
       server.methods.pagedata.getPage('my-page', { status: 'published' }, done);
     },
     cacheCall(call, done) {
+      status = 'fed';
       server.methods.pagedata.getPage('my-page', { status: 'published' }, done);
     },
     verify(call, cacheCall, done) {
-      console.log(call)
-      console.log(cacheCall)
+      // cached value will not be updated:
+      expect(call[0].content.status).to.equal(cacheCall[0].content.status);
       done();
     }
   }, allDone);
