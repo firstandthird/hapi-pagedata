@@ -62,6 +62,41 @@ lab.test('getPage', allDone => {
   }, allDone);
 });
 
+lab.test('getPageContent', allDone => {
+  async.autoInject({
+    register(done) {
+      mockServer.route({
+        method: 'get',
+        path: '/api/pages/my-page',
+        handler(request, reply) {
+          expect(request.query.status).to.equal('published');
+          return reply(null, { slug: 'my-page', content: { status: 'hungry' } });
+        }
+      });
+      server.register({
+        register: require('../'),
+        options: {
+          host: 'http://localhost:8080',
+          key: 'key',
+          cacheEndpoint: '/cache',
+          verbose: true,
+        }
+      }, done);
+    },
+    start(register, done) {
+      server.start(done);
+    },
+    call(start, done) {
+      server.methods.pagedata.getPageContent('my-page', { status: 'published' }, done);
+    },
+    verify(call, done) {
+      expect(typeof call).to.equal('object');
+      expect(call.status).to.equal('hungry');
+      done();
+    }
+  }, allDone);
+});
+
 lab.test('getProjectPages', allDone => {
   async.autoInject({
     register(done) {

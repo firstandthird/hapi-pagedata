@@ -17,9 +17,9 @@ server.register({
     host: process.env.PAGEDATA_HOST || `http://localhost:${port}`,
     key: process.env.PAGEDATA_KEY || 'key',
     status: 'draft',
-    pageCache: process.env.PAGEDATA_CACHE || false,
-    projectPagesCache: process.env.PAGEDATA_CACHE || false,
-    parentPagesCache: process.env.PAGEDATA_CACHE || false,
+    pageCache: { expiresIn: 60 * 1000, staleIn: 5000, staleTimeout: 200, generateTimeout: 5000 },
+    projectPagesCache: { expiresIn: 60 * 1000, staleIn: 5000, staleTimeout: 200, generateTimeout: 5000 },
+    parentPagesCache: { expiresIn: 60 * 1000, staleIn: 5000, staleTimeout: 200, generateTimeout: 5000 },
     verbose: true
   }
 }, (err) => {
@@ -45,7 +45,20 @@ server.register({
     method: 'GET',
     config: {
       pre: [
-        { method: 'pagedata.getPage(params.slug, { populate: "createdBy" })', assign: 'data' }
+        { method: "pagedata.getPage(params.slug)", assign: 'data' }
+      ]
+    },
+    handler(request, reply) {
+      reply(request.pre);
+    }
+  });
+
+  server.route({
+    path: '/pages/{slug}/content',
+    method: 'GET',
+    config: {
+      pre: [
+        { method: 'pagedata.getPageContent(params.slug)', assign: 'data' }
       ]
     },
     handler(request, reply) {
@@ -58,7 +71,7 @@ server.register({
     method: 'GET',
     config: {
       pre: [
-        { method: 'pagedata.getCollectionPages(params.slug, { populate: "content" })', assign: 'data' }
+        { method: 'pagedata.getCollectionPages(params.slug)', assign: 'data' }
       ]
     },
     handler(request, reply) {
@@ -79,7 +92,7 @@ server.register({
     method: 'GET',
     config: {
       pre: [
-        { method: 'pagedata.getProjectPages(params.project, { status: "published" })', assign: 'data' }
+        { method: 'pagedata.getProjectPages(params.project)', assign: 'data' }
       ]
     },
     handler(request, reply) {
@@ -99,7 +112,6 @@ server.register({
     if (serverErr) {
       throw serverErr;
     }
-    //server.methods.pageData.set('test-1', { blah: true });
     console.log('Server started', server.info.uri);
   });
 });
