@@ -12,7 +12,7 @@ lab.beforeEach(done => {
   server = new Hapi.Server({
     debug: { log: ['error', 'info', 'hapi-pagedata'], request: ['error'] }
   });
-  server.connection({ port: 8080 });
+  server.connection({ port: 8081 });
   mockServer = new Hapi.Server({
     debug: { log: ['error', 'info', 'hapi-pagedata'], request: ['error'] }
   });
