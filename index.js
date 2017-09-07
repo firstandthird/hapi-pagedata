@@ -6,45 +6,22 @@ const pkg = require('./package.json');
 
 const defaults = {
   verbose: true,
-  cacheEndpoint: false,
-  hookEndpoint: false,
   userAgent: '',
   status: 'published',
-  populatePage: 'project,parentPage',
-  enablePageCache: false,
-  enableProjectPagesCache: false,
-  enableParentPagesCache: false,
-  cache: {
-    expiresIn: 1000 * 60 * 60 * 24 * 7, //1 week
-    staleIn: 1000 * 60 * 60 * 23, //23 hours
-    staleTimeout: 200,
-    generateTimeout: 5000
-  }
+  pageCache: false,
+  projectPagesCache: false,
+  collectionPagesCache: false,
+  // example options for pageCache/projectPagesCache/collectionPagesCache:
+  // {
+  //   expiresIn: 1000 * 60 * 60 * 24 * 7, //1 week
+  //   staleIn: 1000 * 60 * 60 * 23, //23 hours
+  //   staleTimeout: 200,
+  //   generateTimeout: 5000
+  // }
 };
 
 exports.register = function(server, options, next) {
   const config = hoek.applyToDefaults(defaults, options, true);
-
-  const schema = Joi.object().keys({
-    host: Joi.string().uri().required(),
-    key: Joi.string().required(),
-    status: Joi.string().allow(['drafts', 'published']),
-    populatePage: Joi.string(),
-    enablePageCache: Joi.boolean(),
-    enableProjectPagesCache: Joi.boolean(),
-    enableParentPagesCache: Joi.boolean(),
-    cache: Joi.object().allow(null),
-    cacheEndpoint: Joi.string().allow(false),
-    hookEndpoint: Joi.string().allow(false),
-    hookSuccessMethod: Joi.string().allow(null),
-    userAgent: Joi.string().allow(''),
-    verbose: Joi.boolean()
-  });
-
-  const validation = schema.validate(config);
-  if (validation.error) {
-    return next(validation.error);
-  }
 
   if (!config.userAgent) {
     config.userAgent = `hapi-pagedata/${pkg.version}`;
@@ -57,8 +34,7 @@ exports.register = function(server, options, next) {
   require('./methods/getPage')(server, api, config);
   require('./methods/getPageContent')(server, api, config);
   require('./methods/getProjectPages')(server, api, config);
-  require('./methods/getParentPages')(server, api, config);
-  require('./routes/hook')(server, api, config);
+  require('./methods/getCollectionPages')(server, api, config);
 
   next();
 };

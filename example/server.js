@@ -17,11 +17,9 @@ server.register({
     host: process.env.PAGEDATA_HOST || `http://localhost:${port}`,
     key: process.env.PAGEDATA_KEY || 'key',
     status: 'draft',
-    enablePageCache: process.env.PAGEDATA_CACHE || false,
-    enableProjectPagesCache: process.env.PAGEDATA_CACHE || false,
-    enableParentPagesCache: process.env.PAGEDATA_CACHE || false,
-    cacheEndpoint: '/cache',
-    hookEndpoint: '/hook',
+    pageCache: { expiresIn: 60 * 1000, staleIn: 5000, staleTimeout: 200, generateTimeout: 5000 },
+    projectPagesCache: { expiresIn: 60 * 1000, staleIn: 5000, staleTimeout: 200, generateTimeout: 5000 },
+    parentPagesCache: { expiresIn: 60 * 1000, staleIn: 5000, staleTimeout: 200, generateTimeout: 5000 },
     verbose: true
   }
 }, (err) => {
@@ -47,7 +45,7 @@ server.register({
     method: 'GET',
     config: {
       pre: [
-        { method: 'pagedata.getPage(params.slug)', assign: 'data' }
+        { method: "pagedata.getPage(params.slug)", assign: 'data' }
       ]
     },
     handler(request, reply) {
@@ -73,7 +71,7 @@ server.register({
     method: 'GET',
     config: {
       pre: [
-        { method: 'pagedata.getParentPages(params.slug)', assign: 'data' }
+        { method: 'pagedata.getCollectionPages(params.slug)', assign: 'data' }
       ]
     },
     handler(request, reply) {
@@ -106,7 +104,7 @@ server.register({
     path: '/projects/{project}/collections',
     method: 'GET',
     handler(request, reply) {
-      request.server.plugins['hapi-pagedata'].api.getCollections({ projectSlug: request.params.project }, reply);
+      request.server.plugins['hapi-pagedata'].api.getCollectionPages(request.params.project, { limit: 10 }, reply);
     }
   });
 
@@ -114,8 +112,6 @@ server.register({
     if (serverErr) {
       throw serverErr;
     }
-    //server.methods.pageData.set('test-1', { blah: true });
     console.log('Server started', server.info.uri);
   });
 });
-

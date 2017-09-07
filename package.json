@@ -9,7 +9,7 @@
     "url": "https://github.com/firstandthird/hapi-pagedata.git"
   },
   "scripts": {
-    "test": "lab test",
+    "test": "lab test --leaks",
     "lint": "eslint .",
     "example": "node example/server.js"
   },
