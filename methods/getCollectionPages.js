@@ -1,24 +1,25 @@
 const generateKey = require('../lib/generateKey.js');
 
 module.exports = function(server, api, config) {
-  const cache = config.projectPagesCache ? Object.assign({}, config.projectPagesCache) : undefined;
+  const cache = config.collectionPagesCache ? Object.assign({}, config.collectionPagesCache) : undefined;
 
-  server.method('pagedata.getProjectPages', (projectSlug, query, done) => {
+  server.method('pagedata.getCollectionPages', (parentPageSlug, query, done) => {
     const start = new Date().getTime();
-    query.projectSlug = projectSlug;
+    query.parentPageSlug = parentPageSlug;
     if (!query.status) {
       query.status = config.status;
     }
+    // parentPageSlug,
     api.getPages(query, (err, pages) => {
       if (err) {
         if (config.verbose) {
-          server.log(['pagedata', 'getProjectPages', 'error', projectSlug], err);
+          server.log(['pagedata', 'getCollectionPages', 'error', parentPageSlug], err);
         }
         return done(err);
       }
       if (config.verbose) {
         const end = new Date().getTime();
-        server.log(['pagedata', 'fetch'], { projectSlug, status: query.status, responseTime: end - start });
+        server.log(['pagedata', 'fetch'], { parentPageSlug, status: query.status, responseTime: end - start });
       }
       done(null, pages);
     });

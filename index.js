@@ -10,16 +10,15 @@ const defaults = {
   hookEndpoint: false,
   userAgent: '',
   status: 'published',
-  populatePage: 'project,parentPage',
-  enablePageCache: false,
-  enableProjectPagesCache: false,
-  enableParentPagesCache: false,
-  cache: {
-    expiresIn: 1000 * 60 * 60 * 24 * 7, //1 week
-    staleIn: 1000 * 60 * 60 * 23, //23 hours
-    staleTimeout: 200,
-    generateTimeout: 5000
-  }
+  pageCache: false,
+  projectPagesCache: false,
+  collectionPagesCache: false,
+  // example settings for caches: {
+  //   expiresIn: 1000 * 60 * 60 * 24 * 7, //1 week
+  //   staleIn: 1000 * 60 * 60 * 23, //23 hours
+  //   staleTimeout: 200,
+  //   generateTimeout: 5000
+  // }
 };
 
 exports.register = function(server, options, next) {
@@ -29,11 +28,9 @@ exports.register = function(server, options, next) {
     host: Joi.string().uri().required(),
     key: Joi.string().required(),
     status: Joi.string().allow(['drafts', 'published']),
-    populatePage: Joi.string(),
-    enablePageCache: Joi.boolean(),
-    enableProjectPagesCache: Joi.boolean(),
-    enableParentPagesCache: Joi.boolean(),
-    cache: Joi.object().allow(null),
+    pageCache: Joi.object().allow(false),
+    projectPagesCache: Joi.object().allow(false),
+    collectionPagesCache: Joi.object().allow(false),
     cacheEndpoint: Joi.string().allow(false),
     hookEndpoint: Joi.string().allow(false),
     hookSuccessMethod: Joi.string().allow(null),
@@ -55,10 +52,8 @@ exports.register = function(server, options, next) {
   server.expose('api', api);
 
   require('./methods/getPage')(server, api, config);
-  require('./methods/getPageContent')(server, api, config);
   require('./methods/getProjectPages')(server, api, config);
-  require('./methods/getParentPages')(server, api, config);
-  require('./routes/hook')(server, api, config);
+  require('./methods/getCollectionPages')(server, api, config);
 
   next();
 };
