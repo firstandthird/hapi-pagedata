@@ -20,7 +20,7 @@ const defaults = {
   // }
 };
 
-exports.register = function(server, options, next) {
+const register = async function(server, options) {
   const config = hoek.applyToDefaults(defaults, options, true);
 
   if (!config.userAgent) {
@@ -28,7 +28,6 @@ exports.register = function(server, options, next) {
   }
 
   const api = new PageData(config.host, config.key, config.userAgent);
-
   server.expose('api', api);
 
   require('./methods/getPage')(server, api, config);
@@ -36,10 +35,10 @@ exports.register = function(server, options, next) {
   require('./methods/getProjectPages')(server, api, config);
   require('./methods/getCollectionPages')(server, api, config);
 
-  next();
 };
 
-exports.register.attributes = {
+exports.plugin = {
+  register,
   once: true,
-  pkg
+  pkg: require('./package.json')
 };
