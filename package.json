@@ -25,7 +25,8 @@
     "eslint-config-firstandthird": "^3.2.0",
     "eslint-plugin-import": "^2.1.0",
     "hapi": "^17.0.1",
-    "lab": "^15.1.2"
+    "lab": "^15.1.2",
+    "vision": "^5.2.0"
   },
   "dependencies": {
     "async": "^2.6.0",
