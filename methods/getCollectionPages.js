@@ -13,18 +13,20 @@ module.exports = function(server, api, config) {
       query.status = config.status;
     }
     // parentPageSlug,
-    api.getPages(query, (err, pages) => {
-      if (err) {
-        if (config.verbose) {
-          server.log(['pagedata', 'getCollectionPages', 'error', parentPageSlug], err);
+    return new Promise((resolve, reject) => {
+      api.getPages(query, (err, pages) => {
+        if (err) {
+          if (config.verbose) {
+            server.log(['pagedata', 'getCollectionPages', 'error', parentPageSlug], err);
+          }
+          return reject(err);
         }
-        return Promise.reject(err);
-      }
-      if (config.verbose) {
-        const end = new Date().getTime();
-        server.log(['pagedata', 'fetch'], { parentPageSlug, status: query.status, responseTime: end - start });
-      }
-      Promise.resolve(pages);
+        if (config.verbose) {
+          const end = new Date().getTime();
+          server.log(['pagedata', 'fetch'], { parentPageSlug, status: query.status, responseTime: end - start });
+        }
+        resolve(pages);
+      });
     });
   }, {
     generateKey,
