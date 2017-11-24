@@ -26,86 +26,86 @@ lab.afterEach(async () => {
   await mockServer.stop();
 });
 
-// lab.test('getPage', () => {
-//   return new Promise((resolve, reject) => {
-//     async.autoInject({
-//       register: async function() {
-//         mockServer.route({
-//           method: 'get',
-//           path: '/api/pages/my-page',
-//           handler(request, h) {
-//             expect(request.query.status).to.equal('published');
-//             return { slug: 'my-page', content: { status: 'hungry' } };
-//           }
-//         });
-//         await server.register({
-//           plugin: require('../'),
-//           options: {
-//             host: 'http://localhost:8080',
-//             key: 'key',
-//             cacheEndpoint: '/cache',
-//             verbose: true,
-//           }
-//         });
-//         await server.start();
-//       },
-//       call: async(register) => {
-//         const r = await server.methods.pagedata.getPage('my-page', { status: 'published' });
-//         return r;
-//       },
-//       verify(call, done) {
-//         expect(typeof call.content).to.equal('object');
-//         expect(call.content.status).to.equal('hungry');
-//         expect(call.slug).to.equal('my-page');
-//         done();
-//       }
-//     }, (err, result) => {
-//       if (err) {
-//         return reject(err);
-//       }
-//       resolve();
-//     });
-//   });
-// });
-//
-// lab.test('getPageContent', () => {
-//   return new Promise((resolve, reject) => {
-//     async.autoInject({
-//       register: async() => {
-//         mockServer.route({
-//           method: 'get',
-//           path: '/api/pages/my-page',
-//           handler(request, h) {
-//             expect(request.query.status).to.equal('published');
-//             return { slug: 'my-page', content: { status: 'hungry' } };
-//           }
-//         });
-//         await server.register({
-//           plugin: require('../'),
-//           options: {
-//             host: 'http://localhost:8080',
-//             key: 'key',
-//             cacheEndpoint: '/cache',
-//             verbose: true,
-//           }
-//         });
-//         await server.start();
-//       },
-//       call: async(register) => {
-//         return await server.methods.pagedata.getPageContent('my-page', { status: 'published' });
-//       },
-//       verify: async(call) => {
-//         expect(typeof call).to.equal('object');
-//         expect(call.status).to.equal('hungry');
-//       }
-//     }, (err, result) => {
-//       if (err) {
-//         return reject(err);
-//       }
-//       resolve();
-//     });
-//   });
-// });
+lab.test('getPage', () => {
+  return new Promise((resolve, reject) => {
+    async.autoInject({
+      register: async function() {
+        mockServer.route({
+          method: 'get',
+          path: '/api/pages/my-page',
+          handler(request, h) {
+            expect(request.query.status).to.equal('published');
+            return { slug: 'my-page', content: { status: 'hungry' } };
+          }
+        });
+        await server.register({
+          plugin: require('../'),
+          options: {
+            host: 'http://localhost:8080',
+            key: 'key',
+            cacheEndpoint: '/cache',
+            verbose: true,
+          }
+        });
+        await server.start();
+      },
+      call: async(register) => {
+        const r = await server.methods.pagedata.getPage('my-page', { status: 'published' });
+        return r;
+      },
+      verify(call, done) {
+        expect(typeof call.content).to.equal('object');
+        expect(call.content.status).to.equal('hungry');
+        expect(call.slug).to.equal('my-page');
+        done();
+      }
+    }, (err, result) => {
+      if (err) {
+        return reject(err);
+      }
+      resolve();
+    });
+  });
+});
+
+lab.test('getPageContent', () => {
+  return new Promise((resolve, reject) => {
+    async.autoInject({
+      register: async() => {
+        mockServer.route({
+          method: 'get',
+          path: '/api/pages/my-page',
+          handler(request, h) {
+            expect(request.query.status).to.equal('published');
+            return { slug: 'my-page', content: { status: 'hungry' } };
+          }
+        });
+        await server.register({
+          plugin: require('../'),
+          options: {
+            host: 'http://localhost:8080',
+            key: 'key',
+            cacheEndpoint: '/cache',
+            verbose: true,
+          }
+        });
+        await server.start();
+      },
+      call: async(register) => {
+        return await server.methods.pagedata.getPageContent('my-page', { status: 'published' });
+      },
+      verify: async(call) => {
+        expect(typeof call).to.equal('object');
+        expect(call.status).to.equal('hungry');
+      }
+    }, (err, result) => {
+      if (err) {
+        return reject(err);
+      }
+      resolve();
+    });
+  });
+});
 
 lab.test('getProjectPages', () => {
   return new Promise((resolve, reject) => {
@@ -204,7 +204,7 @@ lab.test('getPage --cache', allDone => {
           path: '/api/pages/my-page',
           handler(request, reply) {
             expect(request.query.status).to.equal('published');
-            return { slug: 'my-page', content: { status } };
+            return [{ slug: 'my-page', content: { status } }];
           }
         });
         await server.register({
@@ -233,8 +233,6 @@ lab.test('getPage --cache', allDone => {
       },
       verify: async(call, cacheCall) => {
         // cached value will not be updated:
-        console.log(call)
-        console.log(cacheCall)
         expect(call[0].content.status).to.equal(cacheCall[0].content.status);
       }
     }, (err, result) => {
