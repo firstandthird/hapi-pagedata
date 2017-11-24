@@ -1,8 +1,8 @@
 const generateKey = require('../lib/generateKey.js');
-
+const util = require('util');
 module.exports = function(server, api, config) {
   const cache = config.pageCache ? Object.assign({}, config.pageCache) : undefined;
-  server.method('pagedata.getPage', async (slug, query) => {
+  server.method('pagedata.getPage', (slug, query) => {
     if (!query) {
       query = {};
     }
@@ -11,22 +11,21 @@ module.exports = function(server, api, config) {
     if (!query.status) {
       query.status = config.status;
     }
-    const result = await new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       api.getPage(slug, query, (err, page) => {
         if (err) {
           if (config.verbose) {
             server.log(['pagedata', 'getPage', 'error', slug], err);
           }
-          return Promise.reject(err);
+          return reject(err);
         }
         if (config.verbose) {
           const end = new Date().getTime();
           server.log(['pagedata', 'fetch'], { page: slug, query, responseTime: end - start });
         }
-        return Promise.resolve(page);
+        resolve(page);
       });
     });
-    return result;
   }, {
     generateKey,
     cache

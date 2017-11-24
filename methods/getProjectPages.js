@@ -12,18 +12,20 @@ module.exports = function(server, api, config) {
     if (!query.status) {
       query.status = config.status;
     }
-    api.getPages(query, (err, pages) => {
-      if (err) {
-        if (config.verbose) {
-          server.log(['pagedata', 'getProjectPages', 'error', projectSlug], err);
+    return new Promise((resolve, reject) => {
+      api.getPages(query, (err, pages) => {
+        if (err) {
+          if (config.verbose) {
+            server.log(['pagedata', 'getProjectPages', 'error', projectSlug], err);
+          }
+          return reject(err);
         }
-        return Promise.reject(err);
-      }
-      if (config.verbose) {
-        const end = new Date().getTime();
-        server.log(['pagedata', 'fetch'], { projectSlug, status: query.status, responseTime: end - start });
-      }
-      Promise.resolve(pages);
+        if (config.verbose) {
+          const end = new Date().getTime();
+          server.log(['pagedata', 'fetch'], { projectSlug, status: query.status, responseTime: end - start });
+        }
+        resolve(pages);
+      });
     });
   }, {
     generateKey,
