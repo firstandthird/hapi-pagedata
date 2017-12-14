@@ -20,16 +20,16 @@
     "db"
   ],
   "devDependencies": {
-    "code": "^4.0.0",
+    "code": "^5.1.2",
     "eslint": "^3.9.1",
     "eslint-config-firstandthird": "^3.2.0",
     "eslint-plugin-import": "^2.1.0",
-    "hapi": "^13.0.0",
-    "lab": "^11.2.1",
-    "mocha": "^3.2.0"
+    "hapi": "^17.1.1",
+    "lab": "^15.1.2",
+    "vision": "^5.2.0"
   },
   "dependencies": {
-    "async": "^2.5.0",
+    "async": "^2.6.0",
     "hoek": "^4.1.1",
     "joi": "^10.6.0",
     "pagedata": "^2.0.0"
