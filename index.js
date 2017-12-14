@@ -11,6 +11,7 @@ const defaults = {
   pageCache: false,
   projectPagesCache: false,
   collectionPagesCache: false,
+  timeout: 0,
   // example options for pageCache/projectPagesCache/collectionPagesCache:
   // {
   //   expiresIn: 1000 * 60 * 60 * 24 * 7, //1 week
@@ -27,7 +28,7 @@ exports.register = function(server, options, next) {
     config.userAgent = `hapi-pagedata/${pkg.version}`;
   }
 
-  const api = new PageData(config.host, config.key, config.userAgent);
+  const api = new PageData(config.host, config.key, config.userAgent, config.timeout);
 
   server.expose('api', api);
 
