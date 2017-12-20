@@ -44,6 +44,7 @@ lab.test('getPage', allDone => {
           key: 'key',
           cacheEndpoint: '/cache',
           verbose: true,
+          timeout: 800,
         }
       }, done);
     },
@@ -80,6 +81,7 @@ lab.test('getPageContent', allDone => {
           key: 'key',
           cacheEndpoint: '/cache',
           verbose: true,
+          timeout: 500
         }
       }, done);
     },
@@ -119,6 +121,7 @@ lab.test('getProjectPages', allDone => {
           key: 'key',
           cacheEndpoint: '/cache',
           verbose: true,
+          timeout: 500
         }
       }, done);
     },
