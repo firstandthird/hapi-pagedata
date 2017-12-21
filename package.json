@@ -20,18 +20,17 @@
     "db"
   ],
   "devDependencies": {
-    "code": "^4.0.0",
-    "eslint": "^3.9.1",
-    "eslint-config-firstandthird": "^3.2.0",
-    "eslint-plugin-import": "^2.1.0",
-    "hapi": "^13.0.0",
-    "lab": "^11.2.1",
-    "mocha": "^3.2.0"
+    "code": "^5.1.2",
+    "eslint": "^4.13.1",
+    "eslint-config-firstandthird": "^4.3.0",
+    "eslint-plugin-import": "^2.8.0",
+    "hapi": "^17.2.0",
+    "lab": "^15.1.2"
   },
   "dependencies": {
-    "async": "^2.5.0",
-    "hoek": "^4.1.1",
-    "joi": "^10.6.0",
-    "pagedata": "^2.1.0"
+    "async": "^2.6.0",
+    "hoek": "^5.0.2",
+    "joi": "^13.0.2",
+    "pagedata": "^3.0.0"
   }
 }

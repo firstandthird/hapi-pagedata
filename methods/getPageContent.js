@@ -1,14 +1,9 @@
 module.exports = function(server, api, config) {
-  server.method('pagedata.getPageContent', (slug, query, done) => {
-    if (typeof query === 'function') {
-      done = query;
+  server.method('pagedata.getPageContent', async(slug, query) => {
+    if (!query) {
       query = {};
     }
-    server.methods.pagedata.getPage(slug, query, (err, page) => {
-      if (err) {
-        return done(err);
-      }
-      return done(null, page.content);
-    });
+    const page = await server.methods.pagedata.getPage(slug, query);
+    return page.content;
   });
 };
