@@ -16,9 +16,13 @@ lab.beforeEach(async () => {
   });
   mockServer = new Hapi.Server({
     debug: { log: ['error', 'info', 'hapi-pagedata'], request: ['error'] },
-    port: 8080
+    port: 9090
   });
-  await mockServer.start();
+  try {
+    await mockServer.start();
+  } catch (e) {
+    console.log(e);
+  }
 });
 
 lab.afterEach(async () => {
@@ -29,27 +33,35 @@ lab.afterEach(async () => {
 lab.test('getPage', () => {
   return new Promise((resolve, reject) => {
     async.autoInject({
-      register: async function() {
+      async register() {
         mockServer.route({
           method: 'get',
           path: '/api/pages/my-page',
           handler(request, h) {
-            expect(request.query.status).to.equal('published');
-            return { slug: 'my-page', content: { status: 'hungry' } };
+            // expect(request.query.status).to.equal('published');
+            return 'hi there';//"{ slug: 'my-page', content: { status: 'hungry' } }";
           }
         });
         await server.register({
           plugin: require('../'),
           options: {
-            host: 'http://localhost:8080',
+            host: 'http://localhost:9090',
             key: 'key',
             cacheEndpoint: '/cache',
             verbose: true,
           }
         });
-        await server.start();
+        try {
+          await server.start();
+        } catch (e) {
+          console.log(e)
+        }
       },
-      call: async(register) => {
+      async call(register) {
+        const response = await mockServer.inject({
+          method: 'get',
+          url: '/api/pages/my-page'
+        })
         const r = await server.methods.pagedata.getPage('my-page', { status: 'published' });
         return r;
       },
@@ -71,7 +83,7 @@ lab.test('getPage', () => {
 lab.test('getPageContent', () => {
   return new Promise((resolve, reject) => {
     async.autoInject({
-      register: async() => {
+      async register() {
         mockServer.route({
           method: 'get',
           path: '/api/pages/my-page',
@@ -91,10 +103,10 @@ lab.test('getPageContent', () => {
         });
         await server.start();
       },
-      call: async(register) => {
+      async call(register) {
         return await server.methods.pagedata.getPageContent('my-page', { status: 'published' });
       },
-      verify: async(call) => {
+      async verify(call) {
         expect(typeof call).to.equal('object');
         expect(call.status).to.equal('hungry');
       }
@@ -110,7 +122,7 @@ lab.test('getPageContent', () => {
 lab.test('getProjectPages', () => {
   return new Promise((resolve, reject) => {
     async.autoInject({
-      register: async() => {
+      async register() {
         mockServer.route({
           method: 'get',
           path: '/api/pages',
@@ -134,7 +146,7 @@ lab.test('getProjectPages', () => {
         });
         await server.start();
       },
-      call: async(register) => {
+      async call(register) {
         return await server.methods.pagedata.getProjectPages('my-project', { populate: 'content' });
       },
       verify(call, done) {
@@ -154,7 +166,7 @@ lab.test('getProjectPages', () => {
 lab.test('getCollectionPages', () => {
   return new Promise((resolve, reject) => {
     async.autoInject({
-      register: async() => {
+      async register() {
         mockServer.route({
           method: 'get',
           path: '/api/pages',
@@ -178,10 +190,10 @@ lab.test('getCollectionPages', () => {
         });
         await server.start();
       },
-      call: async(register) => {
+      async call(register) {
         return await server.methods.pagedata.getCollectionPages('my-collection', { populate: 'content' });
       },
-      verify: async(call) => {
+      async verify(call) {
         expect(call[0].content.status).to.equal('hungry');
         expect(call[1].content.status).to.equal('fed');
       }
@@ -198,7 +210,7 @@ lab.test('getPage --cache', allDone => {
   return new Promise((resolve, reject) => {
     let status = 'hungry';
     async.autoInject({
-      register: async() => {
+      async register() {
         mockServer.route({
           method: 'get',
           path: '/api/pages/my-page',
@@ -224,14 +236,14 @@ lab.test('getPage --cache', allDone => {
         });
         await server.start();
       },
-      call: async() => {
+      async call() {
         return await server.methods.pagedata.getPage('my-page', { status: 'published' });
       },
-      cacheCall: async(call) => {
+      async cacheCall(call) {
         status = 'fed';
         return await server.methods.pagedata.getPage('my-page', { status: 'published' });
       },
-      verify: async(call, cacheCall) => {
+      async verify(call, cacheCall) {
         // cached value will not be updated:
         expect(call[0].content.status).to.equal(cacheCall[0].content.status);
       }

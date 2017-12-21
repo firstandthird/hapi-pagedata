@@ -3,40 +3,37 @@
 const Hapi = require('hapi');
 const port = process.env.PORT || 8080;
 
-const server = new Hapi.Server({
-  debug: {
-    log: ['pagedata', 'error', 'cache'],
-    request: ['error']
-  }
-});
-server.connection({ port });
+const f = async() => {
+  const server = new Hapi.Server({
+    debug: {
+      log: ['pagedata', 'error', 'cache'],
+      request: ['error']
+    },
+    port
+  });
 
-server.register({
-  register: require('../'),
-  options: {
-    host: process.env.PAGEDATA_HOST || `http://localhost:${port}`,
-    key: process.env.PAGEDATA_KEY || 'key',
-    status: 'draft',
-    pageCache: { expiresIn: 60 * 1000, staleIn: 5000, staleTimeout: 200, generateTimeout: 5000 },
-    projectPagesCache: { expiresIn: 60 * 1000, staleIn: 5000, staleTimeout: 200, generateTimeout: 5000 },
-    parentPagesCache: { expiresIn: 60 * 1000, staleIn: 5000, staleTimeout: 200, generateTimeout: 5000 },
-    verbose: true
-  }
-}, (err) => {
-  if (err) {
-    throw err;
-  }
-
+  await server.register({
+    plugin: require('../'),
+    options: {
+      host: process.env.PAGEDATA_HOST || `http://localhost:${port}`,
+      key: process.env.PAGEDATA_KEY || 'key',
+      status: 'draft',
+      pageCache: { expiresIn: 60 * 1000, staleIn: 5000, staleTimeout: 200, generateTimeout: 5000 },
+      projectPagesCache: { expiresIn: 60 * 1000, staleIn: 5000, staleTimeout: 200, generateTimeout: 5000 },
+      parentPagesCache: { expiresIn: 60 * 1000, staleIn: 5000, staleTimeout: 200, generateTimeout: 5000 },
+      verbose: true
+    }
+  });
   //mock pagedata
   server.route({
     path: '/api/pages/{page}',
     method: 'GET',
-    handler(request, reply) {
-      reply({
+    handler(request, h) {
+      return {
         content: {
           page: request.params.page
         }
-      });
+      };
     }
   });
 
@@ -45,14 +42,14 @@ server.register({
     method: 'GET',
     config: {
       pre: [
-        { method: "pagedata.getPage(params.slug)", assign: 'data' }
+        { method: 'pagedata.getPage(params.slug)', assign: 'data' }
       ]
     },
-    handler(request, reply) {
-      reply(request.pre);
+    handler(request, h) {
+      return request.pre;
     }
   });
-
+/*
   server.route({
     path: '/pages/{slug}/content',
     method: 'GET',
@@ -61,8 +58,8 @@ server.register({
         { method: 'pagedata.getPageContent(params.slug)', assign: 'data' }
       ]
     },
-    handler(request, reply) {
-      reply(request.pre);
+    handler(request, h) {
+      return request.pre;
     }
   });
 
@@ -74,16 +71,16 @@ server.register({
         { method: 'pagedata.getCollectionPages(params.slug)', assign: 'data' }
       ]
     },
-    handler(request, reply) {
-      reply(request.pre);
+    handler(request, h) {
+      return request.pre;
     }
   });
 
   server.route({
     path: '/projects',
     method: 'GET',
-    handler(request, reply) {
-      request.server.plugins['hapi-pagedata'].api.getProjects(reply);
+    handler(request, h) {
+      return request.server.plugins['hapi-pagedata'].api.getProjects();
     }
   });
 
@@ -107,11 +104,9 @@ server.register({
       request.server.plugins['hapi-pagedata'].api.getCollectionPages(request.params.project, { limit: 10 }, reply);
     }
   });
+*/
+  await server.start();
+  console.log('Server started', server.info.uri);
+}
 
-  server.start((serverErr) => {
-    if (serverErr) {
-      throw serverErr;
-    }
-    console.log('Server started', server.info.uri);
-  });
-});
+f();
