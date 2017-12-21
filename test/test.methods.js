@@ -44,6 +44,7 @@ lab.test('getPage', allDone => {
           key: 'key',
           cacheEndpoint: '/cache',
           verbose: true,
+          timeout: 800,
         }
       }, done);
     },
@@ -80,6 +81,7 @@ lab.test('getPageContent', allDone => {
           key: 'key',
           cacheEndpoint: '/cache',
           verbose: true,
+          timeout: 500
         }
       }, done);
     },
@@ -119,6 +121,7 @@ lab.test('getProjectPages', allDone => {
           key: 'key',
           cacheEndpoint: '/cache',
           verbose: true,
+          timeout: 500
         }
       }, done);
     },
@@ -220,3 +223,42 @@ lab.test('getPage --cache', allDone => {
     }
   }, allDone);
 });
+
+lab.test('getPage - timeout', allDone => {
+  async.autoInject({
+    register(done) {
+      mockServer.route({
+        method: 'get',
+        path: '/api/pages/my-page',
+        handler(request, reply) {
+          expect(request.query.status).to.equal('published');
+          return setTimeout(() => {
+            reply(null, { slug: 'my-page', content: { status: 'hungry' } });
+          }, 700);
+        }
+      });
+      server.register({
+        register: require('../'),
+        options: {
+          host: 'http://localhost:8080',
+          key: 'key',
+          cacheEndpoint: '/cache',
+          verbose: true,
+          timeout: 500,
+        }
+      }, done);
+    },
+    start(register, done) {
+      server.start(done);
+    },
+    call(start, done) {
+      server.methods.pagedata.getPage('my-page', { status: 'published' }, (err, data) => {
+        expect(typeof err).to.equal('object');
+        expect(err.output.statusCode).to.equal(504);
+        done(null);
+      });
+    }
+  }, allDone);
+});
+
+
