@@ -21,7 +21,7 @@ const defaults = {
   // }
 };
 
-exports.register = function(server, options, next) {
+const register = function(server, options) {
   const config = hoek.applyToDefaults(defaults, options, true);
 
   if (!config.userAgent) {
@@ -36,11 +36,12 @@ exports.register = function(server, options, next) {
   require('./methods/getPageContent')(server, api, config);
   require('./methods/getProjectPages')(server, api, config);
   require('./methods/getCollectionPages')(server, api, config);
-
-  next();
 };
 
-exports.register.attributes = {
+
+exports.plugin = {
+  name: 'hapi-pagedata',
+  register,
   once: true,
-  pkg
+  pkg: require('./package.json')
 };
