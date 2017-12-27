@@ -1,15 +1,12 @@
 /* eslint strict: 0, max-len: 0, prefer-arrow-callback: 0 */
 'use strict';
-const Lab = require('lab');
-const lab = exports.lab = Lab.script();
-const expect = require('code').expect;
 const Hapi = require('hapi');
 const pkg = require('../package.json');
-
+const tap = require('tap');
 let server;
 let mockServer;
 
-lab.beforeEach(async() => {
+tap.beforeEach(async() => {
   server = new Hapi.Server({
     debug: { log: ['error', 'info', 'hapi-pagedata'], request: ['error'] },
     port: 8081
@@ -21,12 +18,12 @@ lab.beforeEach(async() => {
   await mockServer.start();
 });
 
-lab.afterEach(async() => {
+tap.afterEach(async() => {
   await server.stop();
   await mockServer.stop();
 });
 
-lab.test('exposes api and instantiates it with correct options', async() => {
+tap.test('exposes api and instantiates it with correct options', async(t) => {
   await server.register({
     plugin: require('../'),
     options: {
@@ -38,12 +35,22 @@ lab.test('exposes api and instantiates it with correct options', async() => {
     }
   });
   await server.start();
-  expect(typeof server.api).to.equal('object');
-  expect(server.api.options).to.equal({
+  t.equal(typeof server.api, 'object', 'adds the pagedata API to the server');
+  t.deepEqual(server.api.options, {
+    appName: 'theApp',
+    getCollectionPages: false,
     host: 'http://localhost:8080',
     key: 'key',
-    verbose: true,
+    pageCache: false,
+    projectPagesCache: false,
+    status: 'published',
     timeout: 800,
-    userAgent: `theApp pagedata-api/${pkg.version}`
-  });
+    userAgent: `theApp hapi-pagedata/${pkg.version}`,
+    verbose: true
+  }, 'configures the pagedata API correctly');
+  t.equal(typeof server.api.getPage, 'function', 'API provides the getPage method');
+  t.equal(typeof server.api.getPages, 'function', 'API provides the getPages method');
+  t.equal(typeof server.api.getProjects, 'function', 'API provides the getProjects method');
+  await server.stop();
+  t.end();
 });

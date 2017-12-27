@@ -15,7 +15,7 @@ const register = function(server, pluginOptions) {
     projectPagesCache: Joi.boolean().default(false),
     getCollectionPages: Joi.boolean().default(false),
     timeout: Joi.number().default(0),
-  });
+  }).value;
 
   const api = new PageData(config);
 
