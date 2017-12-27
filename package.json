@@ -27,7 +27,6 @@
     "tap": "^11.0.1"
   },
   "dependencies": {
-    "joi": "^13.0.2",
-    "pagedata": "^4.0.0"
+    "pagedata": "^4.0.1"
   }
 }

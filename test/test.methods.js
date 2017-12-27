@@ -19,7 +19,6 @@ tap.beforeEach(async() => {
 });
 
 tap.afterEach(async() => {
-  await server.stop();
   await mockServer.stop();
 });
 
@@ -29,7 +28,7 @@ tap.test('exposes api and instantiates it with correct options', async(t) => {
     options: {
       host: 'http://localhost:8080',
       key: 'key',
-      verbose: true,
+      status: 'published',
       timeout: 800,
       appName: 'theApp'
     }
@@ -37,20 +36,34 @@ tap.test('exposes api and instantiates it with correct options', async(t) => {
   await server.start();
   t.equal(typeof server.api, 'object', 'adds the pagedata API to the server');
   t.deepEqual(server.api.options, {
-    appName: 'theApp',
-    getCollectionPages: false,
     host: 'http://localhost:8080',
     key: 'key',
-    pageCache: false,
-    projectPagesCache: false,
     status: 'published',
     timeout: 800,
-    userAgent: `theApp hapi-pagedata/${pkg.version}`,
-    verbose: true
+    userAgent: `theApp hapi-pagedata/${pkg.version}`
   }, 'configures the pagedata API correctly');
   t.equal(typeof server.api.getPage, 'function', 'API provides the getPage method');
   t.equal(typeof server.api.getPages, 'function', 'API provides the getPages method');
   t.equal(typeof server.api.getProjects, 'function', 'API provides the getProjects method');
   await server.stop();
   t.end();
+});
+
+tap.test('throws error if incorrectly configured', async(t) => {
+  try {
+    await server.register({
+      plugin: require('../'),
+      options: {
+        host: 'http://localhost:8080',
+        key: 'key',
+        somethingsSomethingCache: 'true',
+        timeout: 800,
+        appName: 'theApp'
+      }
+    });
+  } catch (e) {
+    t.equal(e.details[0].message, '"somethingsSomethingCache" is not allowed');
+    await server.stop();
+    t.end();
+  }
 });

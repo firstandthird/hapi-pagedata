@@ -1,24 +1,13 @@
 'use strict';
-const Joi = require('joi');
 const PageData = require('pagedata');
 const pkg = require('./package.json');
 
 const register = function(server, pluginOptions) {
-  const config = Joi.validate(pluginOptions, {
-    host: Joi.string(),
-    key: Joi.string(),
-    appName: Joi.string(),
-    verbose: Joi.boolean().default(true),
-    userAgent: Joi.string().default(`${pluginOptions.appName} hapi-pagedata/${pkg.version}`),
-    status: Joi.string().default('published'),
-    pageCache: Joi.boolean().default(false),
-    projectPagesCache: Joi.boolean().default(false),
-    getCollectionPages: Joi.boolean().default(false),
-    timeout: Joi.number().default(0),
-  }).value;
+  // set the userAgent for the pagedata-api:
+  pluginOptions.userAgent = `${pluginOptions.appName} hapi-pagedata/${pkg.version}`;
+  delete pluginOptions.appName;
 
-  const api = new PageData(config);
-
+  const api = new PageData(pluginOptions);
   server.decorate('server', 'api', api);
 };
 
