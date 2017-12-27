@@ -8,7 +8,7 @@ const register = function(server, pluginOptions) {
   delete pluginOptions.appName;
 
   const api = new PageData(pluginOptions);
-  server.decorate('server', 'api', api);
+  server.decorate('server', 'pagedata', api);
 };
 
 

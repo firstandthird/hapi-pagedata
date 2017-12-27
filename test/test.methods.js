@@ -34,17 +34,17 @@ tap.test('exposes api and instantiates it with correct options', async(t) => {
     }
   });
   await server.start();
-  t.equal(typeof server.api, 'object', 'adds the pagedata API to the server');
-  t.deepEqual(server.api.options, {
+  t.equal(typeof server.pagedata, 'object', 'adds the pagedata API to the server');
+  t.deepEqual(server.pagedata.options, {
     host: 'http://localhost:8080',
     key: 'key',
     status: 'published',
     timeout: 800,
     userAgent: `theApp hapi-pagedata/${pkg.version}`
   }, 'configures the pagedata API correctly');
-  t.equal(typeof server.api.getPage, 'function', 'API provides the getPage method');
-  t.equal(typeof server.api.getPages, 'function', 'API provides the getPages method');
-  t.equal(typeof server.api.getProjects, 'function', 'API provides the getProjects method');
+  t.equal(typeof server.pagedata.getPage, 'function', 'API provides the getPage method');
+  t.equal(typeof server.pagedata.getPages, 'function', 'API provides the getPages method');
+  t.equal(typeof server.pagedata.getProjects, 'function', 'API provides the getProjects method');
   await server.stop();
   t.end();
 });

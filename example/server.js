@@ -30,7 +30,7 @@ const f = async() => {
     path: '/page/{slug}',
     method: 'GET',
     handler(request, h) {
-      return request.server.api.getPage(request.params.slug);
+      return request.server.pagedata.getPage(request.params.slug);
     }
   });
 
@@ -39,7 +39,7 @@ const f = async() => {
     path: '/projects',
     method: 'GET',
     handler(request, h) {
-      return request.server.api.getProjects();
+      return request.server.pagedata.getProjects();
     }
   });
 
@@ -48,7 +48,7 @@ const f = async() => {
     path: '/publishedPages',
     method: 'GET',
     handler(request, h) {
-      return request.server.api.getPages({ status: 'published' });
+      return request.server.pagedata.getPages({ status: 'published' });
     }
   });
   await server.start();
