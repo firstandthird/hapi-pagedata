@@ -9,7 +9,7 @@
     "url": "https://github.com/firstandthird/hapi-pagedata.git"
   },
   "scripts": {
-    "test": "lab test --leaks",
+    "test": "tap test",
     "lint": "eslint .",
     "example": "node example/server.js"
   },
@@ -20,17 +20,13 @@
     "db"
   ],
   "devDependencies": {
-    "code": "^5.1.2",
     "eslint": "^4.13.1",
     "eslint-config-firstandthird": "^4.3.0",
     "eslint-plugin-import": "^2.8.0",
     "hapi": "^17.2.0",
-    "lab": "^15.1.2"
+    "tap": "^11.0.1"
   },
   "dependencies": {
-    "async": "^2.6.0",
-    "hoek": "^5.0.2",
-    "joi": "^13.0.2",
-    "pagedata": "^3.0.1"
+    "pagedata": "^4.0.1"
   }
 }

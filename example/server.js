@@ -3,115 +3,56 @@
 const Hapi = require('hapi');
 const port = process.env.PORT || 8080;
 
-const server = new Hapi.Server({
-  debug: {
-    log: ['pagedata', 'error', 'cache'],
-    request: ['error']
-  }
-});
-server.connection({ port });
+const f = async() => {
+  const server = new Hapi.Server({
+    debug: {
+      log: ['pagedata', 'error', 'cache'],
+      request: ['error']
+    },
+    port
+  });
 
-server.register({
-  register: require('../'),
-  options: {
-    host: process.env.PAGEDATA_HOST || `http://localhost:${port}`,
-    key: process.env.PAGEDATA_KEY || 'key',
-    status: 'draft',
-    pageCache: { expiresIn: 60 * 1000, staleIn: 5000, staleTimeout: 200, generateTimeout: 5000 },
-    projectPagesCache: { expiresIn: 60 * 1000, staleIn: 5000, staleTimeout: 200, generateTimeout: 5000 },
-    parentPagesCache: { expiresIn: 60 * 1000, staleIn: 5000, staleTimeout: 200, generateTimeout: 5000 },
-    verbose: true
-  }
-}, (err) => {
-  if (err) {
-    throw err;
+  try {
+    server.register({
+      plugin: require('../'),
+      options: {
+        host: process.env.PAGEDATA_HOST || `http://localhost:${port}`,
+        key: process.env.PAGEDATA_KEY || 'key'
+      }
+    });
+  } catch (e) {
+    console.log(e);
+    return;
   }
 
-  //mock pagedata
+  // will return the draft version of the page with the indicated slug:
   server.route({
-    path: '/api/pages/{page}',
+    path: '/page/{slug}',
     method: 'GET',
-    handler(request, reply) {
-      reply({
-        content: {
-          page: request.params.page
-        }
-      });
+    handler(request, h) {
+      return request.server.pagedata.getPage(request.params.slug);
     }
   });
 
-  server.route({
-    path: '/pages/{slug}',
-    method: 'GET',
-    config: {
-      pre: [
-        { method: "pagedata.getPage(params.slug)", assign: 'data' }
-      ]
-    },
-    handler(request, reply) {
-      reply(request.pre);
-    }
-  });
-
-  server.route({
-    path: '/pages/{slug}/content',
-    method: 'GET',
-    config: {
-      pre: [
-        { method: 'pagedata.getPageContent(params.slug)', assign: 'data' }
-      ]
-    },
-    handler(request, reply) {
-      reply(request.pre);
-    }
-  });
-
-  server.route({
-    path: '/pages/{slug}/children',
-    method: 'GET',
-    config: {
-      pre: [
-        { method: 'pagedata.getCollectionPages(params.slug)', assign: 'data' }
-      ]
-    },
-    handler(request, reply) {
-      reply(request.pre);
-    }
-  });
-
+  // will return a list of projects:
   server.route({
     path: '/projects',
     method: 'GET',
-    handler(request, reply) {
-      request.server.plugins['hapi-pagedata'].api.getProjects(reply);
+    handler(request, h) {
+      return request.server.pagedata.getProjects();
     }
   });
 
+  // will return all published pages:
   server.route({
-    path: '/projects/{project}',
+    path: '/publishedPages',
     method: 'GET',
-    config: {
-      pre: [
-        { method: 'pagedata.getProjectPages(params.project)', assign: 'data' }
-      ]
-    },
-    handler(request, reply) {
-      reply(request.pre);
+    handler(request, h) {
+      return request.server.pagedata.getPages({ status: 'published' });
     }
   });
+  await server.start();
+  console.log('Server started', server.info.uri);
+};
 
-  server.route({
-    path: '/projects/{project}/collections',
-    method: 'GET',
-    handler(request, reply) {
-      request.server.plugins['hapi-pagedata'].api.getCollectionPages(request.params.project, { limit: 10 }, reply);
-    }
-  });
-
-  server.start((serverErr) => {
-    if (serverErr) {
-      throw serverErr;
-    }
-    console.log('Server started', server.info.uri);
-  });
-});
+f();
