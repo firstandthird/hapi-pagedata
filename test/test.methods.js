@@ -39,6 +39,7 @@ tap.test('exposes api and instantiates it with correct options', async(t) => {
     host: 'http://localhost:8080',
     key: 'key',
     status: 'published',
+    retryOnGet: 0,
     timeout: 800,
     userAgent: `theApp hapi-pagedata/${pkg.version}`
   }, 'configures the pagedata API correctly');
